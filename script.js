@@ -11,7 +11,7 @@
   // Put your WhatsApp number here, digits only, in international format —
   // no "+", no spaces, no dashes. Example: for +233 24 123 4567, use
   // "233241234567". This is the number the finished date details get sent to.
-  const WHATSAPP_NUMBER = "233550368322"; // <-- replace with your real number
+  const WHATSAPP_NUMBER = "233XXXXXXXXX"; // <-- replace with your real number
 
   /* ----------------------------- UTILS ----------------------------- */
   const Utils = {
@@ -564,6 +564,19 @@
       return timeStr >= TIME_MIN && timeStr <= TIME_MAX;
     }
 
+    // Dates before 2026 are never valid for this invite.
+    const DATE_FLOOR = "2026-01-01";
+    function getTodayIso() {
+      const today = new Date();
+      return (
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0")
+      );
+    }
+
     function renderSummary() {
       const dateEl = document.getElementById("summary-date");
       const timeEl = document.getElementById("summary-time");
@@ -581,14 +594,7 @@
       const continueBtn = document.getElementById("btn-schedule-continue");
 
       if (dateInput) {
-        const today = new Date();
-        const iso =
-          today.getFullYear() +
-          "-" +
-          String(today.getMonth() + 1).padStart(2, "0") +
-          "-" +
-          String(today.getDate()).padStart(2, "0");
-        dateInput.min = iso;
+        dateInput.min = DATE_FLOOR; // calendar never scrolls back before 2026
         if (State.data.date) dateInput.value = State.data.date;
       }
       if (timeInput && State.data.time) timeInput.value = State.data.time;
@@ -610,10 +616,11 @@
           if (timeField) timeField.classList.remove("shake");
 
           const dateMissing = !dateVal;
+          const dateInPast = !dateMissing && dateVal < getTodayIso();
           const timeOutOfRange = !isTimeInRange(timeVal);
 
-          if (dateMissing || timeOutOfRange) {
-            if (dateMissing) {
+          if (dateMissing || dateInPast || timeOutOfRange) {
+            if (dateMissing || dateInPast) {
               void dateField.offsetWidth;
               dateField.classList.add("shake");
             }
@@ -622,17 +629,16 @@
               timeField.classList.add("shake");
             }
 
-            if (dateMissing && timeOutOfRange) {
-              errorEl.textContent =
-                "Pick a date — and if you add a time, keep it between 6 and 10pm 💌";
-            } else if (dateMissing) {
+            if (dateMissing) {
               errorEl.textContent = "Pick a date so I know when to come get you 💌";
+            } else if (dateInPast) {
+              errorEl.textContent = "Wrong date — that day has already passed 💔";
             } else {
               errorEl.textContent =
                 "I'm only free between 6 and 10pm — pick a time in that window, or leave it blank 💕";
             }
 
-            (dateMissing ? dateInput : timeInput).focus();
+            (dateMissing || dateInPast ? dateInput : timeInput).focus();
             return;
           }
 
