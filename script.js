@@ -11,7 +11,7 @@
   // Put your WhatsApp number here, digits only, in international format —
   // no "+", no spaces, no dashes. Example: for +233 24 123 4567, use
   // "233241234567". This is the number the finished date details get sent to.
-  const WHATSAPP_NUMBER = "233550368322"; // <-- replace with your real number
+  const WHATSAPP_NUMBER = "233245063303"; // <-- replace with your real number
 
   /* ----------------------------- UTILS ----------------------------- */
   const Utils = {
