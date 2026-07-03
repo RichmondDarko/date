@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Will You Go On A Date With Me? 💌</title>
+<meta name="description" content="A playful little invitation." />
+
+<!-- Fonts: Poppins for headings, Inter for body/UI -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ LOADING SCREEN ============ -->
+  <div id="loader" aria-hidden="true">
+    <div class="loader-heart">
+      <span>❤️</span>
+    </div>
+    <p class="loader-text">getting things ready...</p>
+  </div>
+
+  <!-- ============ AMBIENT BACKGROUND LAYERS ============ -->
+  <!-- Floating hearts drifting upward, purely decorative -->
+  <div id="bg-hearts" aria-hidden="true"></div>
+
+  <!-- Cursor trail canvas (desktop hover trail of tiny hearts) -->
+  <canvas id="trail-canvas" aria-hidden="true"></canvas>
+
+  <!-- Confetti canvas, sits above everything when active -->
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Live region for screen-reader announcements (page changes, dodges) -->
+  <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
+
+  <!-- ============ MUSIC TOGGLE ============ -->
+  <button id="music-toggle" class="music-toggle" type="button" aria-pressed="false" aria-label="Toggle background music">
+    <span class="music-icon" aria-hidden="true">🔈</span>
+  </button>
+
+  <!-- ============ APP ROOT ============ -->
+  <main id="app">
+
+    <!-- ---------- PAGE 1 : THE QUESTION ---------- -->
+    <section class="page active" id="page-question" data-page="question" aria-labelledby="q-heading">
+      <div class="page-inner">
+        <div class="glass-card question-card">
+          <p class="eyebrow">just a small question</p>
+          <h1 id="q-heading" class="headline">Will you go on a date<br class="br-desktop" /> with me? <span class="wave">💌</span></h1>
+          <div class="button-row" id="question-buttons">
+            <button class="btn btn-primary" id="btn-yes" type="button">
+              <span aria-hidden="true">❤️</span> Yes
+            </button>
+            <button class="btn btn-ghost runaway" id="btn-no" type="button"
+              aria-label="No thanks (fair warning, this one doesn't like to be caught)">
+              <span aria-hidden="true">💔</span> No
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 2 : PLOT TWIST ---------- -->
+    <section class="page" id="page-twist" data-page="twist" aria-labelledby="twist-heading">
+      <div class="page-inner">
+        <div class="glass-card">
+          <p class="eyebrow">plot twist</p>
+          <h1 id="twist-heading" class="headline">Wait... you actually<br class="br-desktop" /> said YES?! 😂</h1>
+          <p class="subtext">I was 100% prepared for you to press No 😭<br />You've officially made my day.</p>
+          <div class="button-row single">
+            <button class="btn btn-primary" id="btn-okay" type="button">Okay okay 😂</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 3 : SCHEDULE ---------- -->
+    <section class="page" id="page-schedule" data-page="schedule" aria-labelledby="schedule-heading">
+      <div class="page-inner">
+        <div class="glass-card wide-card">
+          <p class="eyebrow">step one</p>
+          <h1 id="schedule-heading" class="headline">Awesome! When<br class="br-desktop" /> are you free? 📅</h1>
+
+          <div class="field-grid">
+            <label class="field" for="date-input">
+              <span class="field-label"><span aria-hidden="true">📆</span> Pick a date</span>
+              <input type="date" id="date-input" name="date" required />
+            </label>
+            <label class="field" for="time-input">
+              <span class="field-label"><span aria-hidden="true">🕰️</span> Pick a time <span class="field-optional">(optional, 6–10pm)</span></span>
+              <input type="time" id="time-input" name="time" min="18:00" max="22:00" />
+            </label>
+          </div>
+
+          <p class="field-error" id="schedule-error" role="alert" aria-live="assertive"></p>
+
+          <div class="button-row single">
+            <button class="btn btn-primary" id="btn-schedule-continue" type="button">Continue <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 4 : ACTIVITY ---------- -->
+    <section class="page" id="page-activity" data-page="activity" aria-labelledby="activity-heading">
+      <div class="page-inner">
+        <div class="glass-card wide-card">
+          <p class="eyebrow">step two</p>
+          <h1 id="activity-heading" class="headline">What sounds fun?</h1>
+
+          <div class="option-grid" id="option-grid" role="radiogroup" aria-labelledby="activity-heading">
+            <!-- option cards injected identically in HTML for no-JS fallback, enhanced by JS -->
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="dinner">
+              <span class="option-emoji" aria-hidden="true">🍕</span><span class="option-label">Dinner</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="coffee">
+              <span class="option-emoji" aria-hidden="true">☕</span><span class="option-label">Coffee</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="movie">
+              <span class="option-emoji" aria-hidden="true">🎬</span><span class="option-label">Movie</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="icecream">
+              <span class="option-emoji" aria-hidden="true">🍦</span><span class="option-label">Ice Cream</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="bowling">
+              <span class="option-emoji" aria-hidden="true">🎳</span><span class="option-label">Bowling</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="walk">
+              <span class="option-emoji" aria-hidden="true">🌅</span><span class="option-label">Walk</span>
+            </button>
+            <button class="option-card" type="button" role="radio" aria-checked="false" data-value="surprise">
+              <span class="option-emoji" aria-hidden="true">🎡</span><span class="option-label">Surprise Me</span>
+            </button>
+          </div>
+
+          <div class="button-row single">
+            <button class="btn btn-primary" id="btn-activity-continue" type="button" disabled>Continue <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 5 : SUCCESS ---------- -->
+    <section class="page" id="page-success" data-page="success" aria-labelledby="success-heading">
+      <div class="page-inner">
+        <div class="glass-card">
+          <p class="eyebrow">it's official</p>
+          <h1 id="success-heading" class="headline">It's a Date! <span aria-hidden="true">❤️</span></h1>
+          <p class="subtext">I'll come and pick you up <span aria-hidden="true">😊</span></p>
+
+          <dl class="summary" id="summary-list">
+            <div class="summary-row">
+              <dt>Date</dt><dd id="summary-date">—</dd>
+            </div>
+            <div class="summary-row">
+              <dt>Time</dt><dd id="summary-time">—</dd>
+            </div>
+            <div class="summary-row">
+              <dt>Doing</dt><dd id="summary-activity">—</dd>
+            </div>
+          </dl>
+
+          <div class="button-row single">
+            <button class="btn btn-primary" id="btn-cant-wait" type="button">Can't Wait <span aria-hidden="true">❤️</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 6 : THE CALLBACK ---------- -->
+    <section class="page" id="page-callback" data-page="callback" aria-labelledby="callback-heading">
+      <div class="page-inner">
+        <div class="glass-card">
+          <p class="eyebrow">one last thing</p>
+          <h1 id="callback-heading" class="headline">Don't cancel<br class="br-desktop" /> on me 😭❤️</h1>
+          <div class="button-row" id="callback-buttons">
+            <button class="btn btn-primary" id="btn-wont" type="button">I won't <span aria-hidden="true">❤️</span></button>
+            <button class="btn btn-ghost runaway" id="btn-maybe" type="button"
+              aria-label="Maybe (fair warning, this one doesn't like to be caught either)">Maybe...</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PAGE 7 : FAREWELL ---------- -->
+    <section class="page" id="page-farewell" data-page="farewell" aria-labelledby="farewell-heading">
+      <div class="page-inner">
+        <div class="glass-card">
+          <p class="eyebrow">see you soon</p>
+          <h1 id="farewell-heading" class="headline">Promise sealed <span aria-hidden="true">🤝❤️</span></h1>
+          <p class="subtext">Count the days with me. This is going to be a good one.</p>
+
+          <div class="button-row single">
+            <button class="btn btn-primary" id="btn-send-whatsapp" type="button">
+              Send me the details <span aria-hidden="true">💬</span>
+            </button>
+          </div>
+          <p class="field-error" id="whatsapp-note" role="status"></p>
+
+          <button class="text-link" id="btn-restart" type="button">Start over</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
